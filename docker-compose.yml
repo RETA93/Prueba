@@ -3,9 +3,35 @@ services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
       - APP_ENV=production
       - LOG_LEVEL=info
     volumes:
       - ./docs:/app/docs
+  postgres:
+    image: postgres
+    container_name: postgres_container
+    environment:
+      DATABASE_HOST: 127.0.0.1
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "prueba@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

@@ -103,8 +103,8 @@ func main() {
 	handlerWithCommonHeaders := middleware.CommonHeadersMiddleware(mux)
 
 	// Iniciar servidor
-	log.Info("Starting server at port 8080")
-	err := http.ListenAndServe(":8080", handlerWithCommonHeaders)
+	log.Info("Starting server at port 3000")
+	err := http.ListenAndServe(":3000", handlerWithCommonHeaders)
 	if err != nil {
 		log.Fatal(fmt.Sprintf("Server failed: %s", err))
 	}

@@ -1,5 +1,5 @@
 # Use the official Golang image
-FROM golang:1.20 AS builder
+FROM golang:1.22 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -25,6 +25,6 @@ COPY --from=builder /app/main .
 
 # Expose the port the app runs on
 EXPOSE 8080
-
+EXPOSE 3000
 # Command to run the executable
 CMD ["./main"]
