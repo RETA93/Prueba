@@ -111,6 +111,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/ActualizarInventario": {
+            "put": {
+                "description": "Actualiza un registro de inventario existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Actualizar inventario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del inventario",
+                        "name": "inventario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearInventario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/ActualizarProductos": {
             "put": {
                 "description": "Actualiza los datos de un producto existente",
@@ -211,6 +261,92 @@ const docTemplate = `{
                 }
             }
         },
+        "/CrearInventario": {
+            "post": {
+                "description": "Crea un nuevo registro de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Crear inventario",
+                "parameters": [
+                    {
+                        "description": "Datos del inventario",
+                        "name": "inventario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearInventario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/CrearMovimiento": {
+            "post": {
+                "description": "Registra un nuevo movimiento de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Crear movimiento",
+                "parameters": [
+                    {
+                        "description": "Datos del movimiento",
+                        "name": "movimiento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearMovimiento"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MovimientoDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/CrearProductos": {
             "post": {
                 "description": "Crea un nuevo producto en el sistema",
@@ -297,6 +433,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/EliminarInventario": {
+            "delete": {
+                "description": "Elimina un registro de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Eliminar inventario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/EliminarProductos": {
             "delete": {
                 "description": "Elimina un producto del sistema",
@@ -373,6 +547,76 @@ const docTemplate = `{
                 }
             }
         },
+        "/ListarInventarios": {
+            "get": {
+                "description": "Obtiene la lista de todos los inventarios activos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Listar inventarios",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.InventarioDetalle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ListarMovimientos": {
+            "get": {
+                "description": "Obtiene la lista de todos los movimientos de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Listar movimientos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.MovimientoDetalle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/ListarProductos": {
             "get": {
                 "description": "Obtiene la lista de todos los productos activos",
@@ -433,6 +677,88 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ObtenerInventario": {
+            "get": {
+                "description": "Obtiene los detalles de un inventario específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Obtener inventario por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ObtenerMovimiento": {
+            "get": {
+                "description": "Obtiene los detalles de un movimiento específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Obtener movimiento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del movimiento",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MovimientoDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -525,9 +851,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/ActualizarInventario": {
-            "put": {
-                "description": "Actualiza un registro de inventario existente",
+        "/inventory/alerts": {
+            "get": {
+                "description": "Obtiene una lista de productos que están por debajo del stock mínimo",
                 "consumes": [
                     "application/json"
                 ],
@@ -535,24 +861,43 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "inventarios"
+                    "inventario"
                 ],
-                "summary": "Actualizar inventario",
+                "summary": "Listar alertas de stock bajo",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.StockAlert"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/inventory/transfer": {
+            "post": {
+                "description": "Realiza una transferencia de productos entre tiendas con validación de stock",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventario"
+                ],
+                "summary": "Transferir productos entre tiendas",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID del inventario",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "Datos del inventario",
-                        "name": "inventario",
+                        "description": "Datos de la transferencia",
+                        "name": "transfer",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.CrearInventario"
+                            "$ref": "#/definitions/handlers.StockTransfer"
                         }
                     }
                 ],
@@ -560,50 +905,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.InventarioDetalle"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/CrearInventario": {
-            "post": {
-                "description": "Crea un nuevo registro de inventario",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventarios"
-                ],
-                "summary": "Crear inventario",
-                "parameters": [
-                    {
-                        "description": "Datos del inventario",
-                        "name": "inventario",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.CrearInventario"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.InventarioDetalle"
                         }
                     },
                     "400": {
@@ -618,9 +923,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/CrearMovimiento": {
-            "post": {
-                "description": "Registra un nuevo movimiento de inventario",
+        "/stores/{id}/inventory": {
+            "get": {
+                "description": "Obtiene el inventario completo de una tienda específica",
                 "consumes": [
                     "application/json"
                 ],
@@ -628,90 +933,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "movimientos"
+                    "inventario"
                 ],
-                "summary": "Crear movimiento",
-                "parameters": [
-                    {
-                        "description": "Datos del movimiento",
-                        "name": "movimiento",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.CrearMovimiento"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MovimientoDetalle"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/EliminarInventario": {
-            "delete": {
-                "description": "Elimina un registro de inventario",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventarios"
-                ],
-                "summary": "Eliminar inventario",
+                "summary": "Listar inventario por tienda",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID del inventario",
+                        "description": "ID de la tienda",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/ListarInventarios": {
-            "get": {
-                "description": "Obtiene la lista de todos los inventarios activos",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventarios"
-                ],
-                "summary": "Listar inventarios",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -720,123 +953,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/handlers.InventarioDetalle"
                             }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/ListarMovimientos": {
-            "get": {
-                "description": "Obtiene la lista de todos los movimientos de inventario",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "movimientos"
-                ],
-                "summary": "Listar movimientos",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/handlers.MovimientoDetalle"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/ObtenerInventario": {
-            "get": {
-                "description": "Obtiene los detalles de un inventario específico",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventarios"
-                ],
-                "summary": "Obtener inventario por ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID del inventario",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.InventarioDetalle"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/ObtenerMovimiento": {
-            "get": {
-                "description": "Obtiene los detalles de un movimiento específico",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "movimientos"
-                ],
-                "summary": "Obtener movimiento",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID del movimiento",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MovimientoDetalle"
                         }
                     },
                     "404": {
@@ -1148,6 +1264,55 @@ const docTemplate = `{
                     "example": "LAP-001"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.StockAlert": {
+            "type": "object",
+            "properties": {
+                "alert_type": {
+                    "type": "string"
+                },
+                "current_quantity": {
+                    "type": "integer"
+                },
+                "min_stock": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "store_id": {
+                    "type": "string"
+                },
+                "store_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.StockTransfer": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity",
+                "source_store_id",
+                "target_store_id"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "source_store_id": {
+                    "type": "string"
+                },
+                "target_store_id": {
                     "type": "string"
                 }
             }

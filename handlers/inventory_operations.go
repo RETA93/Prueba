@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 // StockTransfer modelo para transferencia de stock
@@ -23,6 +24,7 @@ type StockAlert struct {
 	StoreName   string    `json:"store_name"`
 	Quantity    int       `json:"current_quantity"`
 	MinStock    int       `json:"min_stock"`
+	Alert_Type  string    `json:"alert_type"`
 }
 
 // GetStoreInventory godoc
@@ -37,7 +39,9 @@ type StockAlert struct {
 // @Router       /stores/{id}/inventory [get]
 func (h *InventoryHandler) GetStoreInventory(w http.ResponseWriter, r *http.Request) {
 	// Obtener ID de la tienda de la URL
-	storeID := r.URL.Query().Get("id")
+	vars := mux.Vars(r)   // Obtener los parámetros de la ruta
+	storeID := vars["id"] // El parámetro 'id' es parte de la ruta
+
 	if storeID == "" {
 		http.Error(w, "ID de tienda requerido", http.StatusBadRequest)
 		return
@@ -58,7 +62,7 @@ func (h *InventoryHandler) GetStoreInventory(w http.ResponseWriter, r *http.Requ
         FROM prueba.inventarios i
         JOIN catalogos.productos p ON i.productId = p.id
         JOIN catalogos.tiendas t ON i.storeId = t.id
-        WHERE i.storeId = $1 AND i.activo = true
+        WHERE t.Id = $1 AND i.activo = true
         ORDER BY i.quantity ASC`
 
 	rows, err := h.db.Query(query, storeUUID)
@@ -150,6 +154,7 @@ func (h *InventoryHandler) GetStockAlerts(w http.ResponseWriter, r *http.Request
 			&alert.StoreName,
 			&alert.Quantity,
 			&alert.MinStock,
+			&alert.Alert_Type,
 		)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

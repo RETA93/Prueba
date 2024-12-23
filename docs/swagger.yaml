@@ -213,6 +213,39 @@ definitions:
     - price
     - sku
     type: object
+  handlers.StockAlert:
+    properties:
+      alert_type:
+        type: string
+      current_quantity:
+        type: integer
+      min_stock:
+        type: integer
+      product_id:
+        type: string
+      product_name:
+        type: string
+      store_id:
+        type: string
+      store_name:
+        type: string
+    type: object
+  handlers.StockTransfer:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      source_store_id:
+        type: string
+      target_store_id:
+        type: string
+    required:
+    - product_id
+    - quantity
+    - source_store_id
+    - target_store_id
+    type: object
   handlers.Tienda:
     description: Modelo de tienda para la API
     properties:
@@ -322,6 +355,39 @@ paths:
       summary: Activar/Desactivar tienda
       tags:
       - tiendas
+  /ActualizarInventario:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un registro de inventario existente
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Datos del inventario
+        in: body
+        name: inventario
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearInventario'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar inventario
+      tags:
+      - inventarios
   /ActualizarProductos:
     put:
       consumes:
@@ -388,6 +454,62 @@ paths:
       summary: Actualizar tienda
       tags:
       - tiendas
+  /CrearInventario:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo registro de inventario
+      parameters:
+      - description: Datos del inventario
+        in: body
+        name: inventario
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearInventario'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear inventario
+      tags:
+      - inventarios
+  /CrearMovimiento:
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo movimiento de inventario
+      parameters:
+      - description: Datos del movimiento
+        in: body
+        name: movimiento
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearMovimiento'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.MovimientoDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear movimiento
+      tags:
+      - movimientos
   /CrearProductos:
     post:
       consumes:
@@ -444,6 +566,31 @@ paths:
       summary: Crear nueva tienda
       tags:
       - tiendas
+  /EliminarInventario:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un registro de inventario
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Eliminar inventario
+      tags:
+      - inventarios
   /EliminarProductos:
     delete:
       consumes:
@@ -494,6 +641,52 @@ paths:
       summary: Eliminar tienda
       tags:
       - tiendas
+  /ListarInventarios:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todos los inventarios activos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.InventarioDetalle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar inventarios
+      tags:
+      - inventarios
+  /ListarMovimientos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todos los movimientos de inventario
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.MovimientoDetalle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar movimientos
+      tags:
+      - movimientos
   /ListarProductos:
     get:
       consumes:
@@ -540,6 +733,60 @@ paths:
       summary: Listar todas las tiendas
       tags:
       - tiendas
+  /ObtenerInventario:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un inventario específico
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener inventario por ID
+      tags:
+      - inventarios
+  /ObtenerMovimiento:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un movimiento específico
+      parameters:
+      - description: ID del movimiento
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MovimientoDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener movimiento
+      tags:
+      - movimientos
   /ObtenerProductos:
     get:
       consumes:
@@ -594,125 +841,65 @@ paths:
       summary: Obtener tienda por ID
       tags:
       - tiendas
-  /api/ActualizarInventario:
-    put:
+  /inventory/alerts:
+    get:
       consumes:
       - application/json
-      description: Actualiza un registro de inventario existente
-      parameters:
-      - description: ID del inventario
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: Datos del inventario
-        in: body
-        name: inventario
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CrearInventario'
+      description: Obtiene una lista de productos que están por debajo del stock mínimo
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.InventarioDetalle'
-        "404":
-          description: Not Found
+            items:
+              $ref: '#/definitions/handlers.StockAlert'
+            type: array
+      summary: Listar alertas de stock bajo
+      tags:
+      - inventario
+  /inventory/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Realiza una transferencia de productos entre tiendas con validación
+        de stock
+      parameters:
+      - description: Datos de la transferencia
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.StockTransfer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Actualizar inventario
-      tags:
-      - inventarios
-  /api/CrearInventario:
-    post:
-      consumes:
-      - application/json
-      description: Crea un nuevo registro de inventario
-      parameters:
-      - description: Datos del inventario
-        in: body
-        name: inventario
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CrearInventario'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/handlers.InventarioDetalle'
         "400":
           description: Bad Request
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Crear inventario
+      summary: Transferir productos entre tiendas
       tags:
-      - inventarios
-  /api/CrearMovimiento:
-    post:
-      consumes:
-      - application/json
-      description: Registra un nuevo movimiento de inventario
-      parameters:
-      - description: Datos del movimiento
-        in: body
-        name: movimiento
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.CrearMovimiento'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/handlers.MovimientoDetalle'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Crear movimiento
-      tags:
-      - movimientos
-  /api/EliminarInventario:
-    delete:
-      consumes:
-      - application/json
-      description: Elimina un registro de inventario
-      parameters:
-      - description: ID del inventario
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Eliminar inventario
-      tags:
-      - inventarios
-  /api/ListarInventarios:
+      - inventario
+  /stores/{id}/inventory:
     get:
       consumes:
       - application/json
-      description: Obtiene la lista de todos los inventarios activos
+      description: Obtiene el inventario completo de una tienda específica
+      parameters:
+      - description: ID de la tienda
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -722,92 +909,15 @@ paths:
             items:
               $ref: '#/definitions/handlers.InventarioDetalle'
             type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Listar inventarios
-      tags:
-      - inventarios
-  /api/ListarMovimientos:
-    get:
-      consumes:
-      - application/json
-      description: Obtiene la lista de todos los movimientos de inventario
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/handlers.MovimientoDetalle'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Listar movimientos
-      tags:
-      - movimientos
-  /api/ObtenerInventario:
-    get:
-      consumes:
-      - application/json
-      description: Obtiene los detalles de un inventario específico
-      parameters:
-      - description: ID del inventario
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handlers.InventarioDetalle'
         "404":
           description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Obtener inventario por ID
+      summary: Listar inventario por tienda
       tags:
-      - inventarios
-  /api/ObtenerMovimiento:
-    get:
-      consumes:
-      - application/json
-      description: Obtiene los detalles de un movimiento específico
-      parameters:
-      - description: ID del movimiento
-        in: query
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handlers.MovimientoDetalle'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Obtener movimiento
-      tags:
-      - movimientos
+      - inventario
 schemes:
 - http
 swagger: "2.0"

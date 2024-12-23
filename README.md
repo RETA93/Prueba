@@ -23,3 +23,12 @@ swag init
 # Reconstruir y reiniciar la aplicación
 docker-compose down
 docker-compose up --build
+
+# Tests unitarios
+go test ./... -cover
+
+# Tests de integración
+go test ./tests/integration/... -tags=integration
+
+# Tests de carga
+k6 run tests/load/k6-test.js
