@@ -35,7 +35,9 @@ func main() {
 
 	// Crear handlers
 	productHandler := handlers.NewProductHandler(db)
-
+	shopHandler := handlers.NewShopHandler(db)
+	inventoryHandler := handlers.NewInventoryHandler(db)
+	movementHandler := handlers.NewMovementHandler(db)
 	// Configurar rutas
 	mux := http.NewServeMux()
 
@@ -44,13 +46,37 @@ func main() {
 		httpSwagger.URL("http://localhost:3000/swagger/doc.json"), //The url pointing to API definition
 	))
 
-	// Rutas de la API
-	mux.HandleFunc("/api/ListarProductos", productHandler.HandleProducts)
-	mux.HandleFunc("/api/CrearProductos", productHandler.HandleProducts)
-	mux.HandleFunc("/api/ObtenerProductos", productHandler.HandleProducts)
-	mux.HandleFunc("/api/ActualizarProductos", productHandler.HandleProducts)
-	mux.HandleFunc("/api/ActivarDesactivarProductos", productHandler.HandleProducts)
-	mux.HandleFunc("/api/EliminarProductos", productHandler.HandleProducts)
+	// Rutas de la API Productos
+	mux.HandleFunc("/api/ListarProductos", productHandler.ListarProductos)
+	mux.HandleFunc("/api/CrearProducto", productHandler.CrearProducto)
+	mux.HandleFunc("/api/ObtenerProducto", productHandler.ObtenerProducto)
+	mux.HandleFunc("/api/ActualizarProducto", productHandler.ActualizarProducto)
+	mux.HandleFunc("/api/ActivarDesactivarProducto", productHandler.ToggleProductoEstado)
+	mux.HandleFunc("/api/EliminarProducto", productHandler.EliminarProducto)
+
+	// Rutas de la API Tiendas
+	mux.HandleFunc("/api/ListarTiendas", shopHandler.ListarTiendas)
+	mux.HandleFunc("/api/CrearTiendas", shopHandler.CrearTienda)
+	mux.HandleFunc("/api/ObtenerTiendas", shopHandler.ObtenerTienda)
+	mux.HandleFunc("/api/ActualizarTiendas", shopHandler.ActualizarTienda)
+	mux.HandleFunc("/api/ActivarDesactivarTiendas", shopHandler.ToggleTiendaEstado)
+	mux.HandleFunc("/api/EliminarTiendas", shopHandler.EliminarTienda)
+
+	// Rutas de la API Inventarios
+	mux.HandleFunc("/api/ListarInventarios", inventoryHandler.ListarInventarios)
+	mux.HandleFunc("/api/CrearInventario", inventoryHandler.CrearInventario)
+	mux.HandleFunc("/api/ObtenerInventario", inventoryHandler.ObtenerInventario)
+	mux.HandleFunc("/api/ActualizarInventario", inventoryHandler.ActualizarInventario)
+	mux.HandleFunc("/api/EliminarInventario", inventoryHandler.EliminarInventario)
+
+	// Rutas de la API Movimientos
+	mux.HandleFunc("/api/ListarMovimientos", movementHandler.ListarMovimientos)
+	mux.HandleFunc("/api/CrearMovimiento", movementHandler.CrearMovimiento)
+	mux.HandleFunc("/api/ObtenerMovimiento", movementHandler.ObtenerMovimiento)
+
+	mux.HandleFunc("/api/stores/{id}/inventory", inventoryHandler.GetStoreInventory)
+	mux.HandleFunc("/api/inventory/transfer", inventoryHandler.TransferInventory)
+	mux.HandleFunc("/api/inventory/alerts", inventoryHandler.GetStockAlerts)
 
 	// Aplicar middleware CORS
 	handler := middleware.CORSMiddleware(mux)

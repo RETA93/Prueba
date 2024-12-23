@@ -1,4 +1,813 @@
+basePath: /api
+definitions:
+  handlers.ActualizarProducto:
+    properties:
+      category:
+        example: Electrónicos
+        type: string
+      description:
+        example: Laptop HP con procesador Intel i7
+        type: string
+      name:
+        example: Laptop HP Actualizada
+        type: string
+      price:
+        example: 1299.99
+        type: number
+      sku:
+        example: LAP-002
+        type: string
+    type: object
+  handlers.CrearInventario:
+    description: Modelo para crear nuevo inventario
+    properties:
+      min_stock:
+        minimum: 0
+        type: integer
+      product_id:
+        type: string
+      quantity:
+        minimum: 0
+        type: integer
+      store_id:
+        type: string
+    required:
+    - min_stock
+    - product_id
+    - quantity
+    - store_id
+    type: object
+  handlers.CrearMovimiento:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      source_store_id:
+        type: string
+      target_store_id:
+        type: string
+      type:
+        $ref: '#/definitions/handlers.MovimientoTipo'
+    required:
+    - product_id
+    - quantity
+    - source_store_id
+    - target_store_id
+    - type
+    type: object
+  handlers.CrearProducto:
+    properties:
+      category:
+        example: Electrónicos
+        type: string
+      description:
+        example: Laptop HP con procesador Intel i5
+        type: string
+      name:
+        example: Laptop HP
+        type: string
+      price:
+        example: 999.99
+        type: number
+      sku:
+        example: LAP-001
+        type: string
+    required:
+    - name
+    - price
+    - sku
+    type: object
+  handlers.CrearTienda:
+    properties:
+      address:
+        example: Av. Principal 123
+        type: string
+      name:
+        example: Tienda Central
+        type: string
+      phone:
+        example: 555-0123
+        type: string
+    type: object
+  handlers.InventarioDetalle:
+    description: Modelo detallado de inventario
+    properties:
+      activo:
+        type: boolean
+      created_at:
+        type: string
+      id:
+        type: string
+      min_stock:
+        type: integer
+      product_id:
+        type: string
+      product_name:
+        description: Campos adicionales para mostrar información relacionada
+        type: string
+      quantity:
+        type: integer
+      store_id:
+        type: string
+      store_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  handlers.MovimientoDetalle:
+    properties:
+      activo:
+        type: boolean
+      created_at:
+        type: string
+      id:
+        type: string
+      product_id:
+        type: string
+      product_name:
+        description: Campos adicionales para información relacionada
+        type: string
+      quantity:
+        type: integer
+      source_store_id:
+        type: string
+      source_store_name:
+        type: string
+      target_store_id:
+        type: string
+      target_store_name:
+        type: string
+      timestamp:
+        type: string
+      type:
+        $ref: '#/definitions/handlers.MovimientoTipo'
+      updated_at:
+        type: string
+    type: object
+  handlers.MovimientoTipo:
+    enum:
+    - IN
+    - OUT
+    - TRANSFER
+    type: string
+    x-enum-varnames:
+    - MovimientoIN
+    - MovimientoOUT
+    - MovimientoTRANSFER
+  handlers.Producto:
+    description: Modelo de producto
+    properties:
+      category:
+        example: Electrónicos
+        type: string
+      description:
+        example: Laptop HP con procesador Intel i5
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Laptop HP
+        type: string
+      price:
+        example: 999.99
+        type: number
+      sku:
+        example: LAP-001
+        type: string
+    required:
+    - name
+    - price
+    - sku
+    type: object
+  handlers.ProductoDetalle:
+    properties:
+      activo:
+        example: true
+        type: boolean
+      category:
+        example: Electrónicos
+        type: string
+      created_at:
+        type: string
+      description:
+        example: Laptop HP con procesador Intel i5
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Laptop HP
+        type: string
+      price:
+        example: 999.99
+        type: number
+      sku:
+        example: LAP-001
+        type: string
+      updated_at:
+        type: string
+    required:
+    - name
+    - price
+    - sku
+    type: object
+  handlers.Tienda:
+    description: Modelo de tienda para la API
+    properties:
+      address:
+        example: Av. Principal 123
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Tienda Central
+        type: string
+      phone:
+        example: 555-0123
+        type: string
+    type: object
+  handlers.TiendaDetalle:
+    properties:
+      activo:
+        example: true
+        type: boolean
+      address:
+        example: Av. Principal 123
+        type: string
+      created_at:
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Tienda Central
+        type: string
+      phone:
+        example: 555-0123
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:3000
 info:
   contact: {}
-paths: {}
+  description: API para gestión de productos
+  title: API de Productos
+  version: "1.0"
+paths:
+  /ActivarDesactivarProductos:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado activo/inactivo de un producto
+      parameters:
+      - description: ID del producto
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: true para activar, false para desactivar
+        in: query
+        name: activate
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductoDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Activar/Desactivar producto
+      tags:
+      - productos
+  /ActivarDesactivarTiendas:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado activo/inactivo de una tienda
+      parameters:
+      - description: ID de la tienda
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: true para activar, false para desactivar
+        in: query
+        name: activate
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TiendaDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Activar/Desactivar tienda
+      tags:
+      - tiendas
+  /ActualizarProductos:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un producto existente
+      parameters:
+      - description: ID del producto
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Datos del producto
+        in: body
+        name: producto
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ActualizarProducto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductoDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar producto
+      tags:
+      - productos
+  /ActualizarTiendas:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una tienda existente
+      parameters:
+      - description: ID de la tienda
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Datos actualizados de la tienda
+        in: body
+        name: tienda
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearTienda'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TiendaDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar tienda
+      tags:
+      - tiendas
+  /CrearProductos:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo producto en el sistema
+      parameters:
+      - description: Datos del producto
+        in: body
+        name: producto
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearProducto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ProductoDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear producto
+      tags:
+      - productos
+  /CrearTiendas:
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva tienda en el sistema
+      parameters:
+      - description: Datos de la tienda
+        in: body
+        name: tienda
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearTienda'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.TiendaDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear nueva tienda
+      tags:
+      - tiendas
+  /EliminarProductos:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un producto del sistema
+      parameters:
+      - description: ID del producto
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Eliminar producto
+      tags:
+      - productos
+  /EliminarTiendas:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una tienda del sistema
+      parameters:
+      - description: ID de la tienda
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Eliminar tienda
+      tags:
+      - tiendas
+  /ListarProductos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todos los productos activos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.Producto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar productos
+      tags:
+      - productos
+  /ListarTiendas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todas las tiendas activas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.Tienda'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar todas las tiendas
+      tags:
+      - tiendas
+  /ObtenerProductos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un producto específico
+      parameters:
+      - description: ID del producto
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductoDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener producto por ID
+      tags:
+      - productos
+  /ObtenerTiendas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de una tienda específica
+      parameters:
+      - description: ID de la tienda
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TiendaDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener tienda por ID
+      tags:
+      - tiendas
+  /api/ActualizarInventario:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un registro de inventario existente
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Datos del inventario
+        in: body
+        name: inventario
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearInventario'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Actualizar inventario
+      tags:
+      - inventarios
+  /api/CrearInventario:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo registro de inventario
+      parameters:
+      - description: Datos del inventario
+        in: body
+        name: inventario
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearInventario'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear inventario
+      tags:
+      - inventarios
+  /api/CrearMovimiento:
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo movimiento de inventario
+      parameters:
+      - description: Datos del movimiento
+        in: body
+        name: movimiento
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CrearMovimiento'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.MovimientoDetalle'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Crear movimiento
+      tags:
+      - movimientos
+  /api/EliminarInventario:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un registro de inventario
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Eliminar inventario
+      tags:
+      - inventarios
+  /api/ListarInventarios:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todos los inventarios activos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.InventarioDetalle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar inventarios
+      tags:
+      - inventarios
+  /api/ListarMovimientos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene la lista de todos los movimientos de inventario
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.MovimientoDetalle'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Listar movimientos
+      tags:
+      - movimientos
+  /api/ObtenerInventario:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un inventario específico
+      parameters:
+      - description: ID del inventario
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.InventarioDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener inventario por ID
+      tags:
+      - inventarios
+  /api/ObtenerMovimiento:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene los detalles de un movimiento específico
+      parameters:
+      - description: ID del movimiento
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MovimientoDetalle'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener movimiento
+      tags:
+      - movimientos
+schemes:
+- http
 swagger: "2.0"

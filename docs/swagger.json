@@ -1,7 +1,1206 @@
 {
+    "schemes": [
+        "http"
+    ],
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API para gestión de productos",
+        "title": "API de Productos",
+        "contact": {},
+        "version": "1.0"
     },
-    "paths": {}
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "paths": {
+        "/ActivarDesactivarProductos": {
+            "patch": {
+                "description": "Cambia el estado activo/inactivo de un producto",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Activar/Desactivar producto",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del producto",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "true para activar, false para desactivar",
+                        "name": "activate",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ProductoDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ActivarDesactivarTiendas": {
+            "patch": {
+                "description": "Cambia el estado activo/inactivo de una tienda",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Activar/Desactivar tienda",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la tienda",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "true para activar, false para desactivar",
+                        "name": "activate",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.TiendaDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ActualizarProductos": {
+            "put": {
+                "description": "Actualiza los datos de un producto existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Actualizar producto",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del producto",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del producto",
+                        "name": "producto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActualizarProducto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ProductoDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ActualizarTiendas": {
+            "put": {
+                "description": "Actualiza los datos de una tienda existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Actualizar tienda",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la tienda",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos actualizados de la tienda",
+                        "name": "tienda",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearTienda"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.TiendaDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/CrearProductos": {
+            "post": {
+                "description": "Crea un nuevo producto en el sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Crear producto",
+                "parameters": [
+                    {
+                        "description": "Datos del producto",
+                        "name": "producto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearProducto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ProductoDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/CrearTiendas": {
+            "post": {
+                "description": "Crea una nueva tienda en el sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Crear nueva tienda",
+                "parameters": [
+                    {
+                        "description": "Datos de la tienda",
+                        "name": "tienda",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearTienda"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.TiendaDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/EliminarProductos": {
+            "delete": {
+                "description": "Elimina un producto del sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Eliminar producto",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del producto",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/EliminarTiendas": {
+            "delete": {
+                "description": "Elimina una tienda del sistema",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Eliminar tienda",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la tienda",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ListarProductos": {
+            "get": {
+                "description": "Obtiene la lista de todos los productos activos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Listar productos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.Producto"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ListarTiendas": {
+            "get": {
+                "description": "Obtiene la lista de todas las tiendas activas",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Listar todas las tiendas",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.Tienda"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ObtenerProductos": {
+            "get": {
+                "description": "Obtiene los detalles de un producto específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "productos"
+                ],
+                "summary": "Obtener producto por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del producto",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ProductoDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ObtenerTiendas": {
+            "get": {
+                "description": "Obtiene los detalles de una tienda específica",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Obtener tienda por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID de la tienda",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.TiendaDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ActualizarInventario": {
+            "put": {
+                "description": "Actualiza un registro de inventario existente",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Actualizar inventario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos del inventario",
+                        "name": "inventario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearInventario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/CrearInventario": {
+            "post": {
+                "description": "Crea un nuevo registro de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Crear inventario",
+                "parameters": [
+                    {
+                        "description": "Datos del inventario",
+                        "name": "inventario",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearInventario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/CrearMovimiento": {
+            "post": {
+                "description": "Registra un nuevo movimiento de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Crear movimiento",
+                "parameters": [
+                    {
+                        "description": "Datos del movimiento",
+                        "name": "movimiento",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CrearMovimiento"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MovimientoDetalle"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/EliminarInventario": {
+            "delete": {
+                "description": "Elimina un registro de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Eliminar inventario",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ListarInventarios": {
+            "get": {
+                "description": "Obtiene la lista de todos los inventarios activos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Listar inventarios",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.InventarioDetalle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ListarMovimientos": {
+            "get": {
+                "description": "Obtiene la lista de todos los movimientos de inventario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Listar movimientos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.MovimientoDetalle"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ObtenerInventario": {
+            "get": {
+                "description": "Obtiene los detalles de un inventario específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "inventarios"
+                ],
+                "summary": "Obtener inventario por ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del inventario",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.InventarioDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ObtenerMovimiento": {
+            "get": {
+                "description": "Obtiene los detalles de un movimiento específico",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movimientos"
+                ],
+                "summary": "Obtener movimiento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID del movimiento",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MovimientoDetalle"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.ActualizarProducto": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Electrónicos"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Laptop HP con procesador Intel i7"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Laptop HP Actualizada"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 1299.99
+                },
+                "sku": {
+                    "type": "string",
+                    "example": "LAP-002"
+                }
+            }
+        },
+        "handlers.CrearInventario": {
+            "description": "Modelo para crear nuevo inventario",
+            "type": "object",
+            "required": [
+                "min_stock",
+                "product_id",
+                "quantity",
+                "store_id"
+            ],
+            "properties": {
+                "min_stock": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "store_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.CrearMovimiento": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity",
+                "source_store_id",
+                "target_store_id",
+                "type"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "source_store_id": {
+                    "type": "string"
+                },
+                "target_store_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/handlers.MovimientoTipo"
+                }
+            }
+        },
+        "handlers.CrearProducto": {
+            "type": "object",
+            "required": [
+                "name",
+                "price",
+                "sku"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Electrónicos"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Laptop HP con procesador Intel i5"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Laptop HP"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 999.99
+                },
+                "sku": {
+                    "type": "string",
+                    "example": "LAP-001"
+                }
+            }
+        },
+        "handlers.CrearTienda": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Av. Principal 123"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Tienda Central"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "555-0123"
+                }
+            }
+        },
+        "handlers.InventarioDetalle": {
+            "description": "Modelo detallado de inventario",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "description": "Campos adicionales para mostrar información relacionada",
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "store_id": {
+                    "type": "string"
+                },
+                "store_name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.MovimientoDetalle": {
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "description": "Campos adicionales para información relacionada",
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "source_store_id": {
+                    "type": "string"
+                },
+                "source_store_name": {
+                    "type": "string"
+                },
+                "target_store_id": {
+                    "type": "string"
+                },
+                "target_store_name": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/handlers.MovimientoTipo"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.MovimientoTipo": {
+            "type": "string",
+            "enum": [
+                "IN",
+                "OUT",
+                "TRANSFER"
+            ],
+            "x-enum-varnames": [
+                "MovimientoIN",
+                "MovimientoOUT",
+                "MovimientoTRANSFER"
+            ]
+        },
+        "handlers.Producto": {
+            "description": "Modelo de producto",
+            "type": "object",
+            "required": [
+                "name",
+                "price",
+                "sku"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "Electrónicos"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Laptop HP con procesador Intel i5"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Laptop HP"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 999.99
+                },
+                "sku": {
+                    "type": "string",
+                    "example": "LAP-001"
+                }
+            }
+        },
+        "handlers.ProductoDetalle": {
+            "type": "object",
+            "required": [
+                "name",
+                "price",
+                "sku"
+            ],
+            "properties": {
+                "activo": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "category": {
+                    "type": "string",
+                    "example": "Electrónicos"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Laptop HP con procesador Intel i5"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Laptop HP"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 999.99
+                },
+                "sku": {
+                    "type": "string",
+                    "example": "LAP-001"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.Tienda": {
+            "description": "Modelo de tienda para la API",
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Av. Principal 123"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Tienda Central"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "555-0123"
+                }
+            }
+        },
+        "handlers.TiendaDetalle": {
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "address": {
+                    "type": "string",
+                    "example": "Av. Principal 123"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Tienda Central"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "555-0123"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

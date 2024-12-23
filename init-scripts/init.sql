@@ -137,3 +137,319 @@ INSERT INTO catalogos.productos (
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP
 );
+
+---------------------------------------------------------------------------------------
+-- Insertar tiendas en catalogos.tiendas
+INSERT INTO catalogos.tiendas (
+    id,
+    name,
+    address,
+    phone,
+    activo,
+    created_at,
+    updated_at
+) VALUES 
+(
+    gen_random_uuid(),
+    'Tienda Central',
+    'Av. Reforma 555, Col. Centro, CDMX',
+    '555-0123',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+),
+(
+    gen_random_uuid(),
+    'Sucursal Norte',
+    'Blvd. Manuel Ávila Camacho 2000, Col. San Rafael',
+    '555-0124',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+),
+(
+    gen_random_uuid(),
+    'Tienda Express Sur',
+    'Calzada de Tlalpan 1234, Col. Portales',
+    '555-0125',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+),
+(
+    gen_random_uuid(),
+    'Sucursal Polanco',
+    'Av. Presidente Masaryk 123, Col. Polanco',
+    '555-0126',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+),
+(
+    gen_random_uuid(),
+    'Plaza Satélite',
+    'Circuito Centro Comercial 2251, Cd. Satélite',
+    '555-0127',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+);
+
+---------------------------------------------------------------------------------------
+-- Primero, vamos a almacenar algunos IDs existentes en variables temporales
+WITH product_ids AS (
+    SELECT id FROM catalogos.productos WHERE activo = true LIMIT 3
+),
+store_ids AS (
+    SELECT id FROM catalogos.tiendas WHERE activo = true LIMIT 2
+),
+-- Ahora creamos los registros de inventario
+inventory_inserts AS (
+    SELECT 
+        gen_random_uuid() as id,
+        p.id as product_id,
+        s.id as store_id,
+        floor(random() * 100 + 20)::int as quantity,  -- Cantidad aleatoria entre 20 y 120
+        10 as min_stock  -- Stock mínimo fijo de 10 unidades
+    FROM 
+        (SELECT id FROM product_ids) p
+        CROSS JOIN (SELECT id FROM store_ids) s
+)
+-- Insertamos los registros
+INSERT INTO prueba.inventarios (
+    id,
+    productId,
+    storeId,
+    quantity,
+    minStock,
+    activo,
+    created_at,
+    updated_at
+)
+SELECT 
+    id,
+    product_id,
+    store_id,
+    quantity,
+    min_stock,
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM inventory_inserts;
+
+---------------------------------------------------------------------------------------
+
+-- Insertar movimientos de ejemplo usando productos y tiendas existentes
+WITH product_ids AS (
+    SELECT id FROM catalogos.productos WHERE activo = true LIMIT 3
+),
+store_ids AS (
+    SELECT id FROM catalogos.tiendas WHERE activo = true LIMIT 3
+)
+INSERT INTO prueba.movimientos (
+    id,
+    productId,
+    sourceStoreId,
+    targetStoreId,
+    quantity,
+    type,
+    timestamp
+    activo,      
+    created_at,  
+    updated_at   
+)
+SELECT
+    -- Movimiento tipo IN
+    gen_random_uuid(),
+    (SELECT id FROM product_ids OFFSET 0 LIMIT 1),
+    (SELECT id FROM store_ids OFFSET 0 LIMIT 1),
+    (SELECT id FROM store_ids OFFSET 0 LIMIT 1),
+    100,
+    'IN',
+    CURRENT_TIMESTAMP,
+    true,                
+    CURRENT_TIMESTAMP,   
+    CURRENT_TIMESTAMP    
+UNION ALL
+-- Movimiento tipo OUT
+SELECT
+    gen_random_uuid(),
+    (SELECT id FROM product_ids OFFSET 1 LIMIT 1),
+    (SELECT id FROM store_ids OFFSET 1 LIMIT 1),
+    (SELECT id FROM store_ids OFFSET 1 LIMIT 1),
+    50,
+    'OUT',
+    CURRENT_TIMESTAMP
+    true,                
+    CURRENT_TIMESTAMP,   
+    CURRENT_TIMESTAMP
+UNION ALL
+-- Movimiento tipo TRANSFER
+SELECT
+    gen_random_uuid(),
+    (SELECT id FROM product_ids OFFSET 2 LIMIT 1),
+    (SELECT id FROM store_ids OFFSET 0 LIMIT 1), -- Tienda origen
+    (SELECT id FROM store_ids OFFSET 1 LIMIT 1), -- Tienda destino
+    75,
+    'TRANSFER',
+    CURRENT_TIMESTAMP
+    true,                
+    CURRENT_TIMESTAMP,   
+    CURRENT_TIMESTAMP;
+
+    
+---------------------------------------------------------------------------------------------------
+-- Índices para optimizar consultas frecuentes
+---------------------------------------------------------------------------------------
+-- Índices para productos
+CREATE INDEX idx_productos_sku ON catalogos.productos(sku);
+CREATE INDEX idx_productos_activo ON catalogos.productos(activo);
+CREATE INDEX idx_productos_category ON catalogos.productos(category);
+
+-- Índices para tiendas
+CREATE INDEX idx_tiendas_name ON catalogos.tiendas(name);
+CREATE INDEX idx_tiendas_activo ON catalogos.tiendas(activo);
+
+-- Índices compuestos para inventarios (consultas más frecuentes)
+CREATE INDEX idx_inventarios_producto_tienda ON prueba.inventarios(productId, storeId);
+CREATE INDEX idx_inventarios_tienda_activo ON prueba.inventarios(storeId, activo);
+CREATE INDEX idx_inventarios_stock_bajo ON prueba.inventarios(quantity, minStock) 
+    WHERE activo = true;
+
+-- Índices para movimientos
+CREATE INDEX idx_movimientos_tipo_fecha ON prueba.movimientos(type, timestamp);
+CREATE INDEX idx_movimientos_producto ON prueba.movimientos(productId);
+CREATE INDEX idx_movimientos_tiendas ON prueba.movimientos(sourceStoreId, targetStoreId);
+
+-- Funciones y triggers para mantener updated_at
+---------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Trigger para productos
+CREATE TRIGGER update_productos_updated_at
+    BEFORE UPDATE ON catalogos.productos
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger para tiendas
+CREATE TRIGGER update_tiendas_updated_at
+    BEFORE UPDATE ON catalogos.tiendas
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger para inventarios
+CREATE TRIGGER update_inventarios_updated_at
+    BEFORE UPDATE ON prueba.inventarios
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Trigger para movimientos
+CREATE TRIGGER update_movimientos_updated_at
+    BEFORE UPDATE ON prueba.movimientos
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- Función para transferencia de inventario con validaciones
+---------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION transfer_inventory(
+    p_product_id UUID,
+    p_source_store_id UUID,
+    p_target_store_id UUID,
+    p_quantity INTEGER
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_source_quantity INTEGER;
+    v_movement_id UUID;
+BEGIN
+    -- Verificar cantidad positiva
+    IF p_quantity <= 0 THEN
+        RAISE EXCEPTION 'La cantidad debe ser positiva';
+    END IF;
+
+    -- Verificar stock disponible
+    SELECT quantity INTO v_source_quantity
+    FROM prueba.inventarios
+    WHERE productId = p_product_id 
+    AND storeId = p_source_store_id 
+    AND activo = true
+    FOR UPDATE;
+
+    IF v_source_quantity IS NULL THEN
+        RAISE EXCEPTION 'No existe inventario en la tienda origen';
+    END IF;
+
+    IF v_source_quantity < p_quantity THEN
+        RAISE EXCEPTION 'Stock insuficiente';
+    END IF;
+
+    -- Reducir stock en origen
+    UPDATE prueba.inventarios
+    SET quantity = quantity - p_quantity
+    WHERE productId = p_product_id 
+    AND storeId = p_source_store_id;
+
+    -- Aumentar stock en destino
+    INSERT INTO prueba.inventarios (
+        id, productId, storeId, quantity, minStock, activo
+    )
+    VALUES (
+        gen_random_uuid(), p_product_id, p_target_store_id, p_quantity, 10, true
+    )
+    ON CONFLICT (productId, storeId) 
+    DO UPDATE SET quantity = prueba.inventarios.quantity + p_quantity;
+
+    -- Registrar movimiento
+    INSERT INTO prueba.movimientos (
+        id, productId, sourceStoreId, targetStoreId,
+        quantity, type, timestamp, activo
+    ) VALUES (
+        gen_random_uuid(), p_product_id, p_source_store_id,
+        p_target_store_id, p_quantity, 'TRANSFER',
+        CURRENT_TIMESTAMP, true
+    );
+
+    RETURN TRUE;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Vista para alertas de inventario
+---------------------------------------------------------------------------------------
+CREATE OR REPLACE VIEW prueba.vw_inventory_alerts AS
+SELECT 
+    i.productId,
+    i.storeId,
+    p.name as product_name,
+    t.name as store_name,
+    i.quantity,
+    i.minStock,
+    CASE 
+        WHEN i.quantity = 0 THEN 'SIN_STOCK'
+        WHEN i.quantity <= i.minStock THEN 'STOCK_BAJO'
+        ELSE 'NORMAL'
+    END as alert_type
+FROM prueba.inventarios i
+JOIN catalogos.productos p ON i.productId = p.id
+JOIN catalogos.tiendas t ON i.storeId = t.id
+WHERE i.activo = true AND i.quantity <= i.minStock;
+
+-- Constraints adicionales para integridad de datos
+---------------------------------------------------------------------------------------
+-- Evitar transferencias a la misma tienda
+ALTER TABLE prueba.movimientos
+ADD CONSTRAINT check_different_stores 
+CHECK (sourceStoreId != targetStoreId OR type != 'TRANSFER');
+
+-- Constraint para tipos de movimiento válidos
+ALTER TABLE prueba.movimientos
+ADD CONSTRAINT check_movement_type 
+CHECK (type IN ('IN', 'OUT', 'TRANSFER'));
