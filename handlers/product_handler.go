@@ -3,6 +3,8 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"go-project/utils"
 	"net/http"
 	"time"
 
@@ -88,9 +90,10 @@ func (h *ProductHandler) HandleProducts(w http.ResponseWriter, r *http.Request) 
 // @Router       /ListarProductos [get]
 func (h *ProductHandler) ListarProductos(w http.ResponseWriter, r *http.Request) {
 	rows, err := h.db.Query(`
-        SELECT id, name, description, category, price, sku
+         SELECT id, name, description, category, price, sku
         FROM catalogos.productos 
         WHERE activo = true
+        ORDER BY category, name  
     `)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -133,15 +136,27 @@ func (h *ProductHandler) CrearProducto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Datos por default
-	var ID uuid.UUID = uuid.New()
-	var Activo bool = true
-	var CreatedAt time.Time = time.Now()
+	err := utils.WithTransaction(h.db, func(tx *sql.Tx) error {
+		// Verificar SKU único
+		var exists bool
+		err := tx.QueryRow("SELECT EXISTS(SELECT 1 FROM catalogos.productos WHERE sku = $1)",
+			p.SKU).Scan(&exists)
+		if err != nil {
+			return err
+		}
+		if exists {
+			return fmt.Errorf("SKU ya existe")
+		}
 
-	_, err := h.db.Exec(`
-        INSERT INTO catalogos.productos (id, name, description, category, price, sku, activo, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `, ID, p.Name, p.Description, p.Category, p.Price, p.SKU, Activo, CreatedAt)
+		// Insertar producto
+		_, err = tx.Exec(`
+            INSERT INTO catalogos.productos (
+                id, name, description, category, price, sku, activo, created_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `, uuid.New(), p.Name, p.Description, p.Category, p.Price,
+			p.SKU, true, time.Now())
+		return err
+	})
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

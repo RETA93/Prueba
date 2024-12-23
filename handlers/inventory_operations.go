@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -59,7 +58,8 @@ func (h *InventoryHandler) GetStoreInventory(w http.ResponseWriter, r *http.Requ
         FROM prueba.inventarios i
         JOIN catalogos.productos p ON i.productId = p.id
         JOIN catalogos.tiendas t ON i.storeId = t.id
-        WHERE i.storeId = $1 AND i.activo = true`
+        WHERE i.storeId = $1 AND i.activo = true
+        ORDER BY i.quantity ASC`
 
 	rows, err := h.db.Query(query, storeUUID)
 	if err != nil {
@@ -104,78 +104,14 @@ func (h *InventoryHandler) TransferInventory(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Iniciar transacción
-	tx, err := h.db.Begin()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer tx.Rollback()
-
-	// Verificar stock disponible
-	var currentStock int
-	err = tx.QueryRow(`
-        SELECT quantity 
-        FROM prueba.inventarios 
-        WHERE productId = $1 AND storeId = $2 AND activo = true
-        FOR UPDATE`,
-		transfer.ProductID, transfer.SourceStoreID).Scan(&currentStock)
-
-	if err == sql.ErrNoRows {
-		http.Error(w, "No hay inventario disponible", http.StatusBadRequest)
-		return
-	}
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if currentStock < transfer.Quantity {
-		http.Error(w, "Stock insuficiente", http.StatusBadRequest)
-		return
-	}
-
-	// Reducir stock en tienda origen
-	_, err = tx.Exec(`
-        UPDATE prueba.inventarios
-        SET quantity = quantity - $1, updated_at = CURRENT_TIMESTAMP
-        WHERE productId = $2 AND storeId = $3`,
-		transfer.Quantity, transfer.ProductID, transfer.SourceStoreID)
+	// Llamar a la función de la BD
+	var result bool
+	err := h.db.QueryRow(`
+        SELECT transfer_inventory($1, $2, $3, $4)
+    `, transfer.ProductID, transfer.SourceStoreID,
+		transfer.TargetStoreID, transfer.Quantity).Scan(&result)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Aumentar stock en tienda destino
-	_, err = tx.Exec(`
-        INSERT INTO prueba.inventarios (id, productId, storeId, quantity, minStock, activo)
-        VALUES ($1, $2, $3, $4, 10, true)
-        ON CONFLICT (productId, storeId) DO UPDATE
-        SET quantity = prueba.inventarios.quantity + $4,
-            updated_at = CURRENT_TIMESTAMP`,
-		uuid.New(), transfer.ProductID, transfer.TargetStoreID, transfer.Quantity)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	// Registrar el movimiento
-	_, err = tx.Exec(`
-        INSERT INTO prueba.movimientos (
-            id, productId, sourceStoreId, targetStoreId,
-            quantity, type, timestamp, activo
-        ) VALUES ($1, $2, $3, $4, $5, 'TRANSFER', CURRENT_TIMESTAMP, true)`,
-		uuid.New(), transfer.ProductID, transfer.SourceStoreID,
-		transfer.TargetStoreID, transfer.Quantity)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err = tx.Commit(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -195,19 +131,7 @@ func (h *InventoryHandler) TransferInventory(w http.ResponseWriter, r *http.Requ
 // @Success      200  {array}   StockAlert
 // @Router       /inventory/alerts [get]
 func (h *InventoryHandler) GetStockAlerts(w http.ResponseWriter, r *http.Request) {
-	query := `
-        SELECT 
-            i.productId,
-            i.storeId,
-            p.name as product_name,
-            t.name as store_name,
-            i.quantity,
-            i.minStock
-        FROM prueba.inventarios i
-        JOIN catalogos.productos p ON i.productId = p.id
-        JOIN catalogos.tiendas t ON i.storeId = t.id
-        WHERE i.activo = true AND i.quantity <= i.minStock
-        ORDER BY i.quantity ASC`
+	query := `SELECT * FROM prueba.vw_inventory_alerts ORDER BY quantity ASC`
 
 	rows, err := h.db.Query(query)
 	if err != nil {
