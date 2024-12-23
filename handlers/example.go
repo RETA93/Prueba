@@ -10,7 +10,7 @@ type Response struct {
 }
 
 func ExampleHandler(w http.ResponseWriter, r *http.Request) {
-	response := Response{Message: "Hello, World!"}
+	response := Response{Message: "Hola Mundo!"}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
