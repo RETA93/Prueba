@@ -17,7 +17,7 @@ import (
 // @title           API de Productos
 // @version         1.0
 // @description     API para gestión de productos
-// @host            localhost:3000
+// @host            localhost:8080
 // @BasePath        /api
 // @schemes         http
 
@@ -81,7 +81,7 @@ func main() {
 	handler := middleware.CORSMiddleware(r)
 
 	// Iniciar servidor
-	fmt.Println("Servidor iniciado en http://localhost:3000")
-	fmt.Println("Documentación Swagger en http://localhost:3000/swagger/index.html")
-	log.Fatal(http.ListenAndServe(":3000", handler))
+	fmt.Println("Servidor iniciado en http://localhost:8080")
+	fmt.Println("Documentación Swagger en http://localhost:8080/swagger/index.html")
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }

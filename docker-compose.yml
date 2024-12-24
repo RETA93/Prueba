@@ -15,6 +15,10 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      retries: 5
     restart: always
 
   pgadmin:
@@ -33,7 +37,7 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "8080:8080"
     environment:
       - APP_ENV=production
       - LOG_LEVEL=info
@@ -42,7 +46,8 @@ services:
     networks:
       - app_network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 networks:
   app_network:

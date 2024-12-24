@@ -18,7 +18,7 @@ export let options = {
     },
 };
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://localhost:8080/api';
 
 export default function () {
     // Test listar productos

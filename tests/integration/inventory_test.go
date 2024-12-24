@@ -122,7 +122,7 @@ func crearProducto(t *testing.T, producto CrearProducto) uuid.UUID {
 		t.Fatalf("Error al convertir producto a JSON: %v", err)
 	}
 
-	resp, err := http.Post("http://localhost:3000/api/CrearProducto",
+	resp, err := http.Post("http://localhost:8080/api/CrearProducto",
 		"application/json", bytes.NewBuffer(cuerpo))
 	if err != nil {
 		t.Fatalf("Error al crear producto: %v", err)
@@ -153,7 +153,7 @@ func crearTienda(t *testing.T, tienda CrearTienda) uuid.UUID {
 		t.Fatalf("Error al convertir tienda a JSON: %v", err)
 	}
 
-	resp, err := http.Post("http://localhost:3000/api/CrearTiendas",
+	resp, err := http.Post("http://localhost:8080/api/CrearTiendas",
 		"application/json", bytes.NewBuffer(cuerpo))
 	if err != nil {
 		t.Fatalf("Error al crear tienda: %v", err)
@@ -174,7 +174,7 @@ func crearInventario(t *testing.T, inv CrearInventario) {
 		t.Fatalf("Error al convertir inventario a JSON: %v", err)
 	}
 
-	resp, err := http.Post("http://localhost:3000/api/CrearInventario",
+	resp, err := http.Post("http://localhost:8080/api/CrearInventario",
 		"application/json", bytes.NewBuffer(cuerpo))
 	if err != nil {
 		t.Fatalf("Error al crear inventario: %v", err)
@@ -192,7 +192,7 @@ func realizarTransferencia(t *testing.T, transferencia StockTransfer) *http.Resp
 		t.Fatalf("Error al convertir transferencia a JSON: %v", err)
 	}
 
-	resp, err := http.Post("http://localhost:3000/api/inventory/transfer",
+	resp, err := http.Post("http://localhost:8080/api/inventory/transfer",
 		"application/json", bytes.NewBuffer(cuerpo))
 	if err != nil {
 		t.Fatalf("Error al realizar transferencia: %v", err)
@@ -200,7 +200,7 @@ func realizarTransferencia(t *testing.T, transferencia StockTransfer) *http.Resp
 	return resp
 }
 func verificarInventario(t *testing.T, tiendaID, productoID uuid.UUID, cantidadEsperada int) {
-	resp, err := http.Get(fmt.Sprintf("http://localhost:3000/api/stores/%s/inventory", tiendaID))
+	resp, err := http.Get(fmt.Sprintf("http://localhost:8080/api/stores/%s/inventory", tiendaID))
 	if err != nil {
 		t.Fatalf("Error al obtener inventario: %v", err)
 	}
